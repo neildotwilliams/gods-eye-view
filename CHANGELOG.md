@@ -13,6 +13,14 @@ of current runtime behavior, see [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md
 
 ## [Unreleased]
 
+- Wingbits (Home) layer: set `GEV_LOCAL_READSB_URL` to a readsb/tar1090
+  `aircraft.json` and your own receiver's aircraft get their own Data Layers
+  row, drawn in Wingbits orange. Live Flights hides duplicates while it is on.
+  Contacts are dead-reckoned once a second between polls for smoother motion,
+  sized by aircraft class (shared with Live Flights), and clicking one opens
+  a details box anchored to the click (callsign, altitude, speed, track,
+  squawk, position), the same idea as the CCTV viewer's popup.
+
 - Separate terrain, traffic, FIRMS and GBFS middleware into focused provider
   modules, preserving local configuration, routes and cache/error behavior.
 
