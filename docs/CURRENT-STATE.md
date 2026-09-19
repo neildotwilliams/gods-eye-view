@@ -1,5 +1,46 @@
 # God's Eye View Current State
 
+## Wingbits (Home) receiver layer
+
+When `GEV_LOCAL_READSB_URL` names a readsb/tar1090 `aircraft.json`, the
+`home-receiver-proxy` plugin serves that receiver's aircraft at
+`GET /api/home-receiver` as `{ time, aircraft: [...] }` (plain objects in SI
+units). No other feed is contacted. Positions older than 60 s are dropped,
+snapshots are cached for 2 s, concurrent polls share one request, and a
+failure (3 s timeout, non-OK, oversized or malformed) backs off for 30 s. It
+answers 503 when no receiver is configured and 502 when it is unreachable. The
+URL is server configuration only and must be http(s).
+
+The **Wingbits (Home)** Data Layers row (`home-receiver`, share token `h`)
+polls it every 3 s and draws lightweight billboards and labels in Wingbits
+brand colours (orange `#FF7121` on charcoal `#1E1B1B`): callsign or hex plus
+flight level. Each glyph's shape AND size follow the aircraft's ADS-B emitter
+category (`homeReceiverIconKind`/`homeReceiverIconScale` in
+`src/data/homeReceiver.js`), reusing Live Flights' own `CLASS_SCALE_2D` table
+so a widebody or fastjet reads the same relative size on both layers. Between polls each contact is nudged along its last reported
+track/vertical-rate once a second (client-side dead reckoning,
+`homeReceiverDeadReckon` in `src/data/homeReceiver.js`, capped at 20 s of
+extrapolation) via a single `governorRequestRender` — not a continuous render
+hold — so motion is smoother than the raw 3 s poll without the cost of Live
+Flights' 60fps tracking. There is still no 3D model or tracking/follow-camera
+on this layer. While it is enabled, Live Flights drops its own copy of any
+aircraft the Wingbits layer is drawing, the same hand-off the Military layer
+uses; a tracked flight is exempt. With Live Flights off, the browser makes no
+OpenSky requests at all.
+
+Clicking a Wingbits contact (its own `ScreenSpaceEventHandler`, registered
+with the shared pick-ownership registry like every other clickable layer)
+opens a details box — `src/wingbitsContactPanel.js` — the same idea as the
+CCTV viewer's popup, but self-contained: it injects its own markup and styles
+on first use rather than living in index.html or the panel-stack layout
+system. It shows ICAO24, callsign, squawk, altitude, speed, track, vertical
+rate and position, closes on its own × button or Escape, stays live across
+polls while open, and closes itself if the aircraft drops off the feed. It
+opens anchored to the click that summoned it (`wingbitsContactPosition`),
+clamped to stay fully on screen, rather than at a fixed corner — that avoids
+colliding with the app's own DISPLAY/CCTV/CONTEXT panel column. A poll
+refresh only updates its content and never moves an already-open box.
+
 ## Terrain, traffic, fire and bike-share provider modules
 
 Local composition now imports separate Node modules for Re:Earth heights,

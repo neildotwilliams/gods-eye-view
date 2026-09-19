@@ -94,6 +94,7 @@ import {
 } from './contextStore.js';
 import { CONTACT_MATCH_TIER, contactMatchWins, rankContactMatch } from './contactMatch.js';
 import { holdContinuousRender, releaseContinuousRender } from '../renderGovernor.js';
+import { homeReceiverOwns } from './homeReceiver.js';
 
 const FOCUS_EVIDENCE_DEV = import.meta.env?.DEV === true;
 
@@ -3239,6 +3240,12 @@ function _isUsableOpenSkyState(state) {
  * @param {string} icao24 - Normalized ICAO 24-bit address.
  * @returns {boolean} True when the civil duplicate must be dropped.
  */
+function _homeReceiverSuppresses(icao24) {
+  if (icao24 === _trackedIcao) return false;
+  if (icao24 === _pendingTrackingRestore?.id) return false;
+  return homeReceiverOwns(icao24);
+}
+
 function _militaryLayerSuppresses(icao24) {
   if (!isMilitaryLayerActive()) return false;
   if (icao24 === _trackedIcao) return false;
@@ -4193,7 +4200,9 @@ const flightsLayer = {
         // OpenSky duplicate entirely (except a currently tracked one,
         // which hands off on untrack).
         const isMil = isMilitaryIcao(icao24);
-        if (isMil && _militaryLayerSuppresses(icao24)) {
+        // Same hand-off for the Wingbits (Home) layer: while it draws an
+        // aircraft, this layer drops its own copy (fork addition).
+        if ((isMil && _militaryLayerSuppresses(icao24)) || _homeReceiverSuppresses(icao24)) {
           const dupe = _billboards.get(icao24);
           if (dupe) {
             _billboardCollection.remove(dupe);

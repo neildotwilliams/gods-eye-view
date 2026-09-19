@@ -11,6 +11,7 @@ import bikeshareLayer from '../data/bikeshare.js';
 import aisLiveVesselsLayer from '../data/aisLiveVessels.js';
 import militaryInstallationsLayer from '../data/militaryInstallations.js';
 import militaryAwarenessLayer from '../data/militaryAwareness.js';
+import homeReceiverLayer from '../data/homeReceiverLayer.js';
 import localDataLayers from '../data/localLayers.js';
 import { LAYER_STATE_REGISTRY } from '../data/layerState.js';
 
@@ -34,6 +35,7 @@ export function createStandaloneData({
   });
   dataManager.register(flightsLayer);
   dataManager.register(militaryFlightsLayer);
+  dataManager.register(homeReceiverLayer);
   dataManager.register(earthquakesLayer);
   dataManager.register(satellitesLayer);
   dataManager.register(rocketLaunchesLayer);
