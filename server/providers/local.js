@@ -35,6 +35,7 @@ export { googlePlacesContextProxy, googleServerApiKey, keylessGooglePlacesRespon
 
 import { openSkyProxy, adsbLolFallbackAnchor } from './aircraft/opensky.js';
 import { homeReceiverProxy } from './aircraft/local-receiver.js';
+import { powerCutsProxy } from './powerCuts.js';
 import { adsbLolProxy } from './aircraft/adsb-lol.js';
 import { adsbdbProxy } from './aircraft/enrichment.js';
 import { trackBackfillProxies } from './aircraft/tracks.js';
@@ -4650,6 +4651,7 @@ export function localProviderPlugins() {
   return [
       openSkyProxy(),
       homeReceiverProxy(),
+      powerCutsProxy(),
       celestrakProxy(),
       tomtomProxy(),
       firmsProxy(),
